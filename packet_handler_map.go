@@ -165,7 +165,7 @@ func (h *packetHandlerMap) handlePacket(addr net.Addr, data []byte) error {
 	rcvTime := time.Now()
 
 	r := bytes.NewReader(data)
-	iHdr, err := wire.ParseInvariantHeader(r, h.connIDLen)
+	iHdr, err := wire.ParseHeader(r, h.connIDLen)
 	// drop the packet if we can't parse the header
 	if err != nil {
 		return fmt.Errorf("error parsing invariant header: %s", err)
