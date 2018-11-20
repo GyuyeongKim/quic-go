@@ -74,7 +74,7 @@ func parseInvariantHeaderImpl(b *bytes.Reader, shortHeaderConnIDLen int) (*Invar
 
 // Parse parses the version dependent part of the header.
 // The Reader has to be set such that it points to the first byte of the header.
-func (iv *InvariantHeader) Parse(b *bytes.Reader, sentBy protocol.Perspective, ver protocol.VersionNumber) (*Header, error) {
+func (iv *InvariantHeader) Parse(b *bytes.Reader, sentBy protocol.Perspective, ver protocol.VersionNumber) (*EncryptedHeader, error) {
 	if _, err := b.Seek(int64(iv.len), io.SeekCurrent); err != nil {
 		return nil, err
 	}
@@ -87,8 +87,8 @@ func (iv *InvariantHeader) Parse(b *bytes.Reader, sentBy protocol.Perspective, v
 	return iv.parseShortHeader(b, ver)
 }
 
-func (iv *InvariantHeader) toHeader() *Header {
-	return &Header{
+func (iv *InvariantHeader) toHeader() *EncryptedHeader {
+	return &EncryptedHeader{
 		IsLongHeader:     iv.IsLongHeader,
 		DestConnectionID: iv.DestConnectionID,
 		SrcConnectionID:  iv.SrcConnectionID,
@@ -96,7 +96,7 @@ func (iv *InvariantHeader) toHeader() *Header {
 	}
 }
 
-func (iv *InvariantHeader) parseVersionNegotiationPacket(b *bytes.Reader) (*Header, error) {
+func (iv *InvariantHeader) parseVersionNegotiationPacket(b *bytes.Reader) (*EncryptedHeader, error) {
 	h := iv.toHeader()
 	if b.Len() == 0 {
 		return nil, qerr.Error(qerr.InvalidVersionNegotiationPacket, "empty version list")
@@ -113,7 +113,7 @@ func (iv *InvariantHeader) parseVersionNegotiationPacket(b *bytes.Reader) (*Head
 	return h, nil
 }
 
-func (iv *InvariantHeader) parseLongHeader(b *bytes.Reader, sentBy protocol.Perspective, v protocol.VersionNumber) (*Header, error) {
+func (iv *InvariantHeader) parseLongHeader(b *bytes.Reader, sentBy protocol.Perspective, v protocol.VersionNumber) (*EncryptedHeader, error) {
 	h := iv.toHeader()
 	h.Type = protocol.PacketType(iv.typeByte & 0x7f)
 
@@ -167,7 +167,7 @@ func (iv *InvariantHeader) parseLongHeader(b *bytes.Reader, sentBy protocol.Pers
 	return h, nil
 }
 
-func (iv *InvariantHeader) parseShortHeader(b *bytes.Reader, v protocol.VersionNumber) (*Header, error) {
+func (iv *InvariantHeader) parseShortHeader(b *bytes.Reader, v protocol.VersionNumber) (*EncryptedHeader, error) {
 	h := iv.toHeader()
 	h.KeyPhase = int(iv.typeByte&0x40) >> 6
 

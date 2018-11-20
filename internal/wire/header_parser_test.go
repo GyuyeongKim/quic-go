@@ -180,7 +180,7 @@ var _ = Describe("Header Parsing", func() {
 		It("rejects packets sent with an unknown packet type", func() {
 			srcConnID := protocol.ConnectionID{1, 2, 3, 4, 5, 6, 7, 8}
 			buf := &bytes.Buffer{}
-			err := (&Header{
+			err := (&EncryptedHeader{
 				IsLongHeader:    true,
 				Type:            42,
 				SrcConnectionID: srcConnID,
